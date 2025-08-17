@@ -40,12 +40,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    const token = window.localStorage.getItem('jwt');
-    if (token) {
-      agent.setToken(token);
-    }
-
-    this.props.onLoad(token ? agent.Auth.current() : null, token);
+    this.props.onLoad(agent.Auth.current(), null);
   }
 
   render() {
@@ -78,9 +73,5 @@ class App extends React.Component {
     );
   }
 }
-
-// App.contextTypes = {
-//   router: PropTypes.object.isRequired
-// };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
