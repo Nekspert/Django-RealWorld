@@ -117,7 +117,7 @@ class UserView(APIView):
         except ValidationError as ex:
             return Response({'errors': ex.detail}, status=status.HTTP_400_BAD_REQUEST)
 
-        user_data = serializer.validated_data
+        user_data = serializer.data
         return Response({'user': user_data}, status=status.HTTP_200_OK)
 
     def get(self, request: Request) -> Response:
