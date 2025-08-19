@@ -15,7 +15,7 @@ class ProfileView(APIView):
             return Response({'errors': {'body': 'User does not exists'}}, status=status.HTTP_404_NOT_FOUND)
 
         profile = Profile.objects.get(user__username=username)
-        serializer = ProfileSerializer(profile)
+        serializer = ProfileSerializer(profile, context={'request': request})
         return Response({'profile': serializer.data}, status=status.HTTP_200_OK)
 
     def post(self, request: Request, username: str, *args, **kwargs) -> Response:
@@ -29,10 +29,14 @@ class ProfileView(APIView):
             return Response({'errors': {'body': 'You can not follow yourself.'}}, status=status.HTTP_400_BAD_REQUEST)
 
         cur_profile = cur_user.profile
-        cur_profile.follow(other_user.profile)
+        other_profile = other_user.profile
+        # if cur_profile.is_following(other_profile):
+        #     return Response()
 
-        serializer = ProfileSerializer(instance=other_user.profile, context={'request': request})
-        return Response({'profile': serializer.data}, status=status.HTTP_201_CREATED)
+        cur_profile.follow(other_profile)
+
+        serializer = ProfileSerializer(instance=other_profile, context={'request': request})
+        return Response({'profile': serializer.data}, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, username: str, *args, **kwargs) -> Response:
         other_user = get_user_model().objects.filter(username=username).exists()
