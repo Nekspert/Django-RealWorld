@@ -7,6 +7,7 @@ class Profile(models.Model):
     image = models.URLField(blank=True, null=True, verbose_name='Изображение')
 
     follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False)
+    favorites = models.ManyToManyField('articles.Article', related_name='favorited_by')
 
     def __str__(self):
         return self.user.username
@@ -22,3 +23,12 @@ class Profile(models.Model):
 
     def is_followed_by(self, profile) -> bool:
         return self.followed_by.filter(pk=profile.pk).exists()
+
+    def favorite(self, article):
+        self.favorites.add(article)
+
+    def unfavorite(self, article):
+        self.favorites.remove(article)
+
+    def has_favorited(self, article) -> bool:
+        return self.favorites.filter(pk=article.pk).exists()

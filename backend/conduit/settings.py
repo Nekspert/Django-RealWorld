@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'profiles.apps.ProfilesConfig',
     'articles.apps.ArticlesConfig',
     'tags.apps.TagsConfig',
+    'comments.apps.CommentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -143,12 +144,13 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'DEFAULT_PAGINATION_CLASS': 'core.custompagination.LimitOffsetPaginationWithUpperBound',
     'PAGE_SIZE': env.int('PAGE_SIZE'),
     'DEFAULT_THROTTLE_CLASSES': ('rest_framework.throttling.AnonRateThrottle',
                                  'rest_framework.throttling.UserRateThrottle',),
     'DEFAULT_THROTTLE_RATES': {'anon': '60/min',
                                'user': '100/min'},
+    'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler',
 }
 
 SIMPLE_JWT = {
