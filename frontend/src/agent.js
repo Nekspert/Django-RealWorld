@@ -6,7 +6,58 @@ const superagent = superagentPromise(_superagent, global.Promise);
 const API_ROOT = 'http://localhost:8000/api';
 
 const encode = encodeURIComponent;
-const responseBody = res => res.body;
+const responseBody = res => {
+    const body = res && res.body;
+
+    // Если тело отсутствует — вернуть пустой объект
+    if (!body) return {};
+
+    // --- если уже в формате Conduit frontend expects
+    // { articles: [...], articlesCount: N }
+    if (body.articles !== undefined && body.articlesCount !== undefined) {
+        return body;
+    }
+
+    // --- если это DRF пагинация: { count, next, previous, results }
+    if (body.count !== undefined && body.results !== undefined) {
+        const results = body.results;
+
+        // если results — объект { articles: [...], articlesCount: N }
+        if (results && results.articles !== undefined && results.articlesCount !== undefined) {
+            return {
+                articles: results.articles,
+                articlesCount: results.articlesCount
+            };
+        }
+
+        // если results — массив статей
+        if (Array.isArray(results)) {
+            return {
+                articles: results,
+                articlesCount: body.count
+            };
+        }
+
+        // fallback
+        return {
+            articles: [],
+            articlesCount: body.count || 0
+        };
+    }
+
+    // --- если это стандартный single-entity response: { article: {...} } или { tags: [...] }
+    if (body.article !== undefined || body.tags !== undefined || body.user !== undefined || body.profile !== undefined) {
+        return body;
+    }
+
+    // --- если вернулся просто массив (редко) — преобразуем в ожидемый формат
+    if (Array.isArray(body)) {
+        return { articles: body, articlesCount: body.length };
+    }
+
+    // В остальных случаях отдаем как есть
+    return body;
+};
 
 let refreshPromise = null;
 const tryRequestWithRefresh = fn =>

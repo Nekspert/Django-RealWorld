@@ -1,7 +1,9 @@
 from django.db import models
 
+from core.models import TimestampModel
 
-class Tag(models.Model):
+
+class Tag(TimestampModel):
     tag = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
 

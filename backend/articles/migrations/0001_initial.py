@@ -12,13 +12,15 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Tag',
+            name='Article',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('tag', models.CharField(max_length=255)),
-                ('slug', models.SlugField(unique=True)),
+                ('slug', models.SlugField(max_length=255, unique=True)),
+                ('title', models.CharField(max_length=255)),
+                ('description', models.TextField()),
+                ('body', models.TextField()),
             ],
             options={
                 'ordering': ['-created_at', 'updated_at'],
